@@ -1,0 +1,258 @@
+.container-fluid {
+    display: flex;
+    justify-content: center; /* Horizontally centers the content */
+    align-items: center; /* Vertically centers the content */
+    min-height: 100vh; /* Ensures it takes up the full viewport height */
+}
+
+.sidebar {
+    height: 80vh;
+    background-color: #2c3e50;
+    position: fixed;
+    width: 350px; /* Increased width */
+    top: 100px;
+    left: 20px;
+    overflow: hidden;
+    padding: 10px;
+    border-radius: 10px; /* Increased border radius */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar img {
+    width: 100%;
+    border-radius: 50%;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.employee-info {
+    text-align: center;
+    color: white;
+}
+
+.details-container span {
+    font-size: 20px; /* Adjust the font size as needed */
+}
+
+/* Name Navbar */
+.name-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #343a40;
+    color: white;
+    padding: 10px 20px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.name-navbar span {
+    flex-grow: 1; /* Ensures the name is centered */
+    text-align: center;
+}
+
+.logout {
+    margin-left: auto; /* Ensures the logout button aligns to the right */
+}
+
+/* Main Content Container Styling */
+.content-container {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    height: fit-content;
+}
+
+/* Content Section */
+.content {
+    margin-top: 80px;
+    margin-left: 370px; /* Adjusted for increased sidebar width */
+    padding: 20px;
+    max-height: 700px;
+    overflow: auto;
+}
+
+/* Attendance and Update Buttons */
+.attendance-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Employee Details Grid */
+.details-container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    row-gap: 10px;
+    column-gap: 20px;
+    align-items: center;
+}
+
+.details-container strong {
+    font-weight: 600;
+}
+.navbarmobile{
+    display: none;
+}
+
+
+/* Media Queries */
+@media (max-width: 1024px) {
+    /* Adjust sidebar width for medium screens */
+    .sidebar {
+        width: 300px; /* Reduce width on medium screens */
+    }
+
+    /* Adjust the content area to give space for sidebar */
+    .content {
+        margin-left: 320px; /* Adjust content margin for sidebar */
+    }
+    .navbarmobile{
+    display: none;
+}
+}
+
+/* Mobile View Adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        height: auto;
+        margin-top: 10px;
+        padding: 10px;
+        box-shadow: none;
+        border-radius: 0; /* Remove border radius for mobile */
+    }
+.navbarmobile{
+    display: none;
+}
+   /* Default Image Size */
+.sidebar img {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+}
+
+    .logout-btn-container {
+        position: static;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .content {
+        margin-top: 150px; /* Adjust the content margin-top to avoid overlap with navbar */
+        padding: 10px;
+        margin-left: 0; /* Remove left margin to take full width */
+        max-height: none;
+    }
+
+    .attendance-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Fix the content-container height */
+    .content-container {
+        height: auto; /* Remove fixed height to avoid content collapse */
+        padding-bottom: 20px; /* Add bottom padding to make the content look neat */
+    }
+
+    .mobnavbar{
+        background-color: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 10px;
+
+
+    }
+}@media (max-width: 425px) {
+    .name-navbar {
+      display: none; /* Hide name-navbar */
+    }
+  
+    .navbarmobile {
+      display: block; /* Show navbarmobile */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%; /* Full width for mobile */
+      z-index: 1000;
+      margin: 5px;
+    }
+  
+    .content-container {
+      margin-top: 80px;
+      height: fit-content;
+      margin: 5px;
+    }
+  
+    .overall {
+      display: flex;
+      flex-direction: column; /* Stacks divs vertically */
+    }
+  
+    .content {
+      position: relative;
+      margin-top: 70px; /* Adjust top margin to align with sidebar */
+      order: -1; /* Places the second div first */
+    }
+    
+   .overall .text-white {
+    
+      display: none;
+      
+    }
+    .sidebar{
+        display: none;
+        background-color: rgb(255, 255, 255);
+    }
+    .sidebar img {
+      display: none;
+      background-color: rgb(116, 69, 182);
+    }
+    .employee-info {
+        display: none;
+    }
+  /* .fileuploadbtn{
+    display: none;
+  } */
+    .MarkAttendance,
+    .UpdateEmployee {
+      display: none; /* Hide MarkAttendance and UpdateEmployee buttons */
+    }
+    .mobnavbar{
+        background-color: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 10px;
+
+
+    }
+  }
+  
+  /* Media Query: For screens > 425px */
+  @media (min-width: 426px) {
+    .navbarmobile {
+      display: none; /* Hide navbarmobile */
+    }
+     .sidebar {
+    
+        display: none;
+        background-color: rgb(25, 28, 42);
+      }
+  }

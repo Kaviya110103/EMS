@@ -1,0 +1,91 @@
+.attendance-details-card {
+    width: 100%;
+    background-color: white;
+    border-radius:10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+  }
+  
+  .attendance-header {
+    font-size: 1.3rem;
+  }
+  
+  .attendance-status {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  
+  .attendance-images {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .image-column {
+    text-align: center;
+    flex: 1 1 45%;
+  }
+  
+  .attendance-image {
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 20px;
+    margin: 5px;
+    padding: 10px;
+  }
+  
+  .attendance-date {
+    margin-top: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .attendance-details-card {
+
+      margin-top: 10pxpx;
+      padding: 0px;
+    }
+  
+    .attendance-header {
+      font-size: 1.2rem;
+    }
+  
+    .attendance-images {
+      flex: 1 1 100%;
+    }
+  
+    .attendance-image {
+      min-width: 130px;
+      min-height: 130px;
+      padding: 8px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .attendance-header {
+      font-size: 1.0rem;
+    }
+  
+    .attendance-images {
+      flex: 1 1 100%;
+      text-align: center;
+    }
+  
+    .attendance-image {
+      max-width: 100px;
+      max-height: 100px;
+      padding: 6px;
+    }
+  }
+  
+  .total-working-hours {
+    margin-top: 20px;
+    text-align: center;
+  }
+  

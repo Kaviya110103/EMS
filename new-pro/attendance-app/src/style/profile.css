@@ -1,0 +1,22 @@
+.nav-borders {
+    background-color: #f8f9fa; /* Example background color for the nav */
+    border-bottom: 2px solid #007bff; /* Example border color */
+    padding: 10px;
+  }
+  
+  .nav-borders .nav-link {
+    color: #515a5a ; /* Color for the links */
+    font-size: 16px;
+    margin-right: 10px;
+    text-decoration: none;
+  }
+  
+  .nav-borders .nav-link:hover {
+    color: #0056b3; /* Change color on hover */
+    text-decoration: underline;
+  }
+  
+  .nav-borders .ms-auto {
+    color: #dc3545; /* Color for the Logout link */
+  }
+ 

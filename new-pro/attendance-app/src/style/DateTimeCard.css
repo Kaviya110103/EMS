@@ -1,0 +1,60 @@
+/* DateTimeCard.css */
+.date-time-card {
+    width: 100%;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .time-string {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .date-day-container {
+    text-align: right;
+  }
+  
+  .date-string {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .day-string {
+    font-size: 16px;
+    color: #6c757d;
+  }
+  
+  /* Media Queries for smaller screens */
+  @media (max-width: 768px) {
+    .time-string {
+      font-size: 20px; /* Decrease font size for time */
+    }
+  
+    .date-string {
+      font-size: 16px; /* Decrease font size for date */
+    }
+  
+    .day-string {
+      font-size: 14px; /* Decrease font size for day */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .time-string {
+      font-size: 18px; /* Further decrease font size for time */
+    }
+  
+    .date-string {
+      font-size: 14px; /* Further decrease font size for date */
+    }
+  
+    .day-string {
+      font-size: 12px; /* Further decrease font size for day */
+    }
+  }
+  

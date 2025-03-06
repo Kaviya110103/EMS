@@ -1,0 +1,115 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #c00d0d;
+  padding: 20px;
+
+    overflow-y: auto;
+  
+  
+}
+
+.container {
+  max-width: 400px;
+  margin: auto;
+  background: rgb(247, 241, 241);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-height: 100%;
+  padding-bottom: 20px; /* Add padding to allow scrolling */
+
+  height: 100%;
+  margin: 0;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.time-display {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.2em;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #28a745;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+#timeInBtn {
+  background-color: #28a745;
+  color: white;
+}
+
+#timeOutBtn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.record {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #e9ecef;
+  border-radius: 5px;
+}
+
+.record p {
+  margin: 5px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.radiobox{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.PresentRadio{
+  font-size: large;
+}
+.AbsentRadio{
+  font-size: large;
+}
+
+
+
+/* /////////////////////// add adtttendance cssss */
+
+.navbar {
+  background-color: #0a2e38;
+  color: #ffffff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+  margin: 0;
+  padding: 5px 10px;
+  font-family: 'Share Tech Mono', monospace;
+  text-shadow: 0 0 10px rgba(10, 175, 230, 1);
+}

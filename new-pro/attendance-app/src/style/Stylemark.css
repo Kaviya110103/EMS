@@ -1,0 +1,85 @@
+/* Overall Navbar styling */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding:10px;
+    background-color:#343a40; /* Dark background */
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+    border-radius: 20px;
+  }
+
+  .navbarmob{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding:10px;
+    background-color:#343a40; /* Dark background */
+    color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 10;
+    border-radius: 20px;
+  }
+  
+  /* Rounded logo styling */
+  .navbar-logo .logo {
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    object-fit: cover; /* Ensure image fits nicely */
+    border: 2px solid #fff;
+  }
+  
+  /* Menu icon (hamburger) styling */
+  .menu-icon {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+  }
+  
+  .menu-bar {
+    width: 25px;
+    height: 3px;
+    background-color: #fff;
+    border-radius: 5px;
+    transition: 0.3s ease-in-out;
+  }
+  
+  /* Dropdown menu styling */
+  .menu-items {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #444; /* Slightly lighter shade */
+    overflow: hidden;
+    max-height: 0;
+    display: flex;
+    flex-direction: column;
+    transition: max-height 0.3s ease-in-out;
+    border-radius: 10px;
+  }
+  
+  .menu-items.open {
+    max-height: 300px; /* Adjust based on the menu items' height */
+  }
+  
+  .menu-items a {
+    padding: 1rem;
+    text-decoration: none;
+    color: #fff;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .menu-items a:hover {
+    background-color: #555; /* Highlight effect */
+  }
+  
