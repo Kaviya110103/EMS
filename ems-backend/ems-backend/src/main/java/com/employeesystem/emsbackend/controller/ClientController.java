@@ -22,7 +22,10 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -321,4 +324,36 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping(value = "/displayImagesByAttendanceId/{attendanceId}")
+public ResponseEntity<Map<String, Object>> displayImagesByAttendanceId(@PathVariable("attendanceId") Long attendanceId) {
+    try {
+        Optional<Image> imageOptional = imageRepository.findByAttendanceId(attendanceId);
+        
+        if (imageOptional.isPresent()) {
+            Image image = imageOptional.get();
+            Map<String, Object> response = new HashMap<>();
+            
+            response.put("attendanceId", attendanceId);
+            response.put("imageId", image.getId()); // Include Image ID
+            
+            if (image.getImage() != null) {
+                response.put("imageUrl1", "http://localhost:8080/api/images/displayImage1ByAttendanceId/" + attendanceId);
+            }
+            if (image.getImage2() != null) {
+                response.put("imageUrl2", "http://localhost:8080/api/images/displayImage2ByAttendanceId/" + attendanceId);
+            }
+
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "No images found for this attendance ID"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Collections.singletonMap("error", "Internal server error"));
+    }
+}
+
 }
