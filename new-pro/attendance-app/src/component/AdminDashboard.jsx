@@ -296,7 +296,7 @@ const AdminDashboard = () => {
                                 >
                                     <i className="fas fa-user-check fa-2x"></i>
                                     <div className="button-text">
-                                        <span>Today Attendees</span>
+                                        <span>Today Attendees 66</span>
                                         <br />
                                         <span id="presentCount" className="count-value">{presentCount}</span>
 

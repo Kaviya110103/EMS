@@ -1,0 +1,55 @@
+.branch-cards {
+    display: flex;
+    justify-content: space-between;
+    /* Distribute space evenly */
+    margin-bottom: 20px;
+    /* Add some spacing below the cards */
+}
+
+.branch-card {
+    flex: 1;
+    /* Each card takes equal space */
+    padding: 10px;
+    /* Reduce padding for smaller size */
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+    max-width: 150px;
+    /* Limit the maximum width of each card */
+    margin: 0;
+    /* Remove any margin */
+}
+
+.branch-card:hover {
+    border-color: #007bff;
+    background-color: #e9f5ff;
+    transform: translateY(-3px);
+    /* Smaller lift on hover */
+}
+
+.branch-card.active {
+    border-color: #007bff;
+    background-color: #007bff;
+    color: white;
+}
+
+.branch-card.active .branch-icon {
+    color: white;
+}
+
+.branch-icon {
+    font-size: 24px;
+    /* Smaller icon size */
+    margin-bottom: 5px;
+    /* Reduce spacing below the icon */
+    color: #007bff;
+}
+
+.branch-label {
+    font-size: 14px;
+    /* Smaller font size */
+    font-weight: bold;
+}
