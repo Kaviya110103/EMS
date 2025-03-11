@@ -101,11 +101,12 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
     attendanceDetails.timeOut && // If timeOut exists
     !images?.imageUrl2; // But imageUrl2 (TimeOut image) does not exist
 
-  const shouldShowDayClose =
-  attendanceDetails.timeIn && // If timeIn exists
-    images?.imageUrl1 && // If TimeIn image exists
-    attendanceDetails.timeOut && // If timeOut exists
-    images?.imageUrl2; // But imageUrl2 (TimeOut image) does not exist
+    const shouldShowDayClose =
+    attendanceDetails.timeIn &&
+    images?.imageUrl1 &&
+    attendanceDetails.timeOut &&
+    images?.imageUrl2 &&
+    isToday(attendanceDetails.dateIn);
 
 
 
@@ -158,9 +159,12 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
       )}
 
       {showStartDayButton && (
-        <button onClick={handleStartDayClick} className="start-day-button">
+              <div className="d-flex justify-content-center align-items-center">
+
+        <button onClick={handleStartDayClick} className="button-33">
           Start Day
         </button>
+        </div>
       )}
 
       {showTimeIn && (

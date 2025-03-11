@@ -1,48 +1,124 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-function TodayAbsent() {
-    const [attendanceData, setAttendanceData] = useState([]);
-    const [absentEmployees, setAbsentEmployees] = useState([]);
-    const [filteredAbsentEmployees, setFilteredAbsentEmployees] = useState([]);
-    const [selectedBranch, setSelectedBranch] = useState('');
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+const AbsenteesTable = () => {
+    const [employeeIds, setEmployeeIds] = useState([]); // State to store employee IDs
+    const [absenteesList, setAbsenteesList] = useState([]); // State to store absentees
+    const [todayDate, setTodayDate] = useState(''); // State to store today's date
+    const [employeeDetails, setEmployeeDetails] = useState([]); // State to store employee details
+    const [selectedBranch, setSelectedBranch] = useState(''); // State to store selected branch
 
+    // Fetch employee data from the API
     useEffect(() => {
-        fetchAttendanceData();
+        const fetchEmployeeData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/emp`);
+                const employeeData = response.data;
+
+                // Extract employee IDs and set the state
+                const ids = employeeData.map(employee => employee.id);
+                setEmployeeIds(ids);
+
+                // Store employee details for later use
+                setEmployeeDetails(employeeData);
+            } catch (error) {
+                console.error('Error fetching employee data:', error);
+            }
+        };
+
+        fetchEmployeeData();
     }, []);
 
+    // Fetch attendance data for all employees
     useEffect(() => {
-        if (selectedBranch) {
-            setFilteredAbsentEmployees(absentEmployees.filter(employee => employee.employee.branch === selectedBranch));
-        } else {
-            setFilteredAbsentEmployees(absentEmployees);
+        const fetchAttendanceData = async () => {
+            try {
+                // Get today's date in YYYY-MM-DD format
+                const today = new Date().toISOString().split('T')[0];
+                setTodayDate(today);
+
+                // Fetch attendance data from the API
+                const response = await axios.get(`http://localhost:8080/api/attendance`);
+                const attendanceData = response.data;
+
+                // Create a list of absentees
+                const absentees = employeeIds
+                    .map(employeeId => {
+                        const todaysRecord = attendanceData.find(record =>
+                            record.employee.id === employeeId && record.dateIn === today
+                        );
+
+                        // Find employee details
+                        const employee = employeeDetails.find(emp => emp.id === employeeId);
+
+                        // Consider "No record for today" and "Absent" as absent
+                        if (!todaysRecord || todaysRecord.attendanceStatus === 'Absent') {
+                            return {
+                                employeeId,
+                                status: todaysRecord ? todaysRecord.attendanceStatus : 'No record for today',
+                                employeeDetails: employee ? {
+                                    firstName: employee.firstName,
+                                    lastName: employee.lastName,
+                                    branch: employee.branch,
+                                    mobile: employee.mobile,
+                                    email: employee.email,
+                                    profileImage: employee.profileImage
+                                } : null,
+                                dateIn: today,
+                                timeIn: todaysRecord ? todaysRecord.timeIn : 'N/A',
+                                timeOut: todaysRecord ? todaysRecord.timeOut : 'N/A'
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(employee => employee !== null); // Filter out null values
+
+                setAbsenteesList(absentees);
+
+                // Automatically mark as absent if no record by 2 PM
+                const currentTime = new Date();
+                if (currentTime.getHours() >= 19) { // 2 PM is 14:00 in 24-hour format
+                    absentees.forEach(async (employee) => {
+                        if (employee.status === 'No record for today') {
+                            await handleMarkAbsent(employee.employeeId);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching attendance data:', error);
+                setAbsenteesList([{ employeeId: 'Error', status: 'Failed to fetch data', employeeDetails: null }]);
+            }
+        };
+
+        if (employeeIds.length > 0 && employeeDetails.length > 0) {
+            fetchAttendanceData();
         }
-    }, [selectedBranch, absentEmployees]);
+    }, [employeeIds, employeeDetails]);
 
-    const fetchAttendanceData = async () => {
-        try {
-            const response = await axios.get("http://localhost:8080/api/attendance");
-            setAttendanceData(response.data);
-            filterAbsentEmployees(response.data);
-        } catch (err) {
-            console.error("Error fetching attendance data", err);
-        }
-    };
-
-    const filterAbsentEmployees = (data) => {
-        const absent = data.filter(
-            (attendance) => attendance.dateIn === today && attendance.attendanceStatus === "Absent"
-        );
-        const uniqueAbsent = Array.from(new Set(absent.map(a => a.employee.id)))
-            .map(id => absent.find(a => a.employee.id === id));
-        setAbsentEmployees(uniqueAbsent);
-        setFilteredAbsentEmployees(uniqueAbsent);
-    };
-
+    // Handle branch filter change
     const handleBranchChange = (branch) => {
         setSelectedBranch(branch);
     };
+
+    // Function to mark attendance as absent
+    const handleMarkAbsent = async (employeeId) => {
+        try {
+            await axios.post("http://localhost:8080/api/attendance/mark-absent", null, {
+                params: { employeeId },
+            });
+
+            alert(`Employee ${employeeId} marked as Absent successfully!`);
+            window.location.reload(); // Refresh the page after marking as Absent
+        } catch (error) {
+            console.error("Error marking attendance as absent:", error);
+            alert("Failed to mark attendance as Absent.");
+        }
+    };
+
+    // Filter absentees based on selected branch
+    const filteredAbsentEmployees = selectedBranch
+        ? absenteesList.filter(employee => employee.employeeDetails.branch === selectedBranch)
+        : absenteesList;
 
     return (
         <div className="container mt-4 bg-light p-4 shadow rounded">
@@ -123,19 +199,18 @@ function TodayAbsent() {
                             <th>Mobile</th>
                             <th>Branch</th>
                             <th>Date</th>
-                            <th>Time In</th>
-                            <th>Time Out</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredAbsentEmployees.map((attendance) => (
-                            <tr key={attendance.id} className="text-center">
-                                <td>{attendance.employee.id}</td>
+                            <tr key={attendance.employeeId} className="text-center">
+                                <td>{attendance.employeeId}</td>
                                 <td>
                                     <img
                                         src={
-                                            attendance.employee.profileImage
-                                                ? `http://localhost:8080/${attendance.employee.profileImage}`
+                                            attendance.employeeDetails.profileImage
+                                                ? `http://localhost:8080/${attendance.employeeDetails.profileImage}`
                                                 : "http://bootdey.com/img/Content/avatar/avatar1.png"
                                         }
                                         alt="Profile"
@@ -146,12 +221,11 @@ function TodayAbsent() {
                                         }}
                                     />
                                 </td>
-                                <td>{attendance.employee.firstName}</td>
-                                <td>{attendance.employee.mobile}</td>
-                                <td>{attendance.employee.branch}</td>
+                                <td>{attendance.employeeDetails.firstName} {attendance.employeeDetails.lastName}</td>
+                                <td>{attendance.employeeDetails.mobile}</td>
+                                <td>{attendance.employeeDetails.branch}</td>
                                 <td>{attendance.dateIn}</td>
-                                <td>{attendance.timeIn || "N/A"}</td>
-                                <td>{attendance.timeOut || "N/A"}</td>
+                                <td>{attendance.status}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -163,6 +237,6 @@ function TodayAbsent() {
             )}
         </div>
     );
-}
+};
 
-export default TodayAbsent;
+export default AbsenteesTable;

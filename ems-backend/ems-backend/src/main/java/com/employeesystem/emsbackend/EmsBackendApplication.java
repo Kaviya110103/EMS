@@ -2,7 +2,7 @@ package com.employeesystem.emsbackend;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-
+ 
 @SpringBootApplication
 @EntityScan("com.employeesystem.emsbackend.entity") // Specify the package
 public class EmsBackendApplication {

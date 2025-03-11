@@ -12,7 +12,6 @@ import java.util.Optional;
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
     List<Attendance> findByAttendanceStatus(String attendanceStatus);
-
     List<Attendance> findByEmployeeId(Long employeeId);
 
     @Query("SELECT a FROM Attendance a WHERE a.employee.id = :employeeId ORDER BY a.timeIn DESC")
