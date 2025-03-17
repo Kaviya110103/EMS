@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FaUser, FaCalendarAlt, FaCalendarCheck, FaMoneyBillWave, FaClock, FaTimesCircle } from "react-icons/fa";
 
 function EmployeeAttendanceSalary() {
     const [employeeId, setEmployeeId] = useState("");
@@ -84,23 +85,54 @@ function EmployeeAttendanceSalary() {
     };
 
     return (
-        <div className="flex flex-col items-center min-h-screen bg-gray-100 p-6">
-            <div className="w-full max-w-6xl bg-white  shadow-2xl rounded-2xl p-6">
-                <h3 className="text-2xl font-bold text-center text-blue-600 mb-6">Employee Attendance & Salary</h3>
+        <div className="flex flex-col items-center min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-6">
+            <div className="w-full max-w-6xl bg-white shadow-2xl rounded-2xl p-8">
+                <h3 className="text-3xl font-bold text-center text-blue-800 mb-8 flex items-center justify-center">
+                    <FaCalendarCheck className="mr-3 text-blue-600" />
+                    Employee Attendance & Salary
+                </h3>
                 
-                <div className="grid grid-cols-5 text-center gap-4 mb-6">
-                    <input type="text" className="p-2 m-3 border rounded" placeholder="Employee ID" value={employeeId} onChange={(e) => setEmployeeId(e.target.value)} />
-                    <select className="p-2 border m-3 rounded" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
-                        <option value="">Select Month</option>
-                        {[...Array(12)].map((_, i) => (
-                            <option key={i} value={i + 1}>{new Date(0, i).toLocaleString("en", { month: "long" })}</option>
-                        ))}
-                    </select>
-                    <input type="number" className="p-2 m-3 border rounded" placeholder="Year" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} />
-                    <input type="number" className="p-2 m-3 border rounded" placeholder="Week Off Days" value={weekOffDays} onChange={(e) => setWeekOffDays(parseInt(e.target.value) || 0)} />
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                    <div className="relative">
+                        <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <input 
+                            type="text" 
+                            className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            placeholder="Employee ID" 
+                            value={employeeId} 
+                            onChange={(e) => setEmployeeId(e.target.value)} 
+                        />
+                    </div>
+                    <div className="relative">
+                        <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <select 
+                            className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            value={selectedMonth} 
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                        >
+                            <option value="">Select Month</option>
+                            {[...Array(12)].map((_, i) => (
+                                <option key={i} value={i + 1}>{new Date(0, i).toLocaleString("en", { month: "long" })}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <input 
+                        type="number" 
+                        className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Year" 
+                        value={selectedYear} 
+                        onChange={(e) => setSelectedYear(e.target.value)} 
+                    />
+                    <input 
+                        type="number" 
+                        className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Week Off Days" 
+                        value={weekOffDays} 
+                        onChange={(e) => setWeekOffDays(parseInt(e.target.value) || 0)} 
+                    />
                 </div>
                 
-                <table className="min-w-full bg-white text-center border text-center rounded-lg shadow-md">
+                 <table className="min-w-full bg-white text-center border text-center rounded-lg shadow-md">
                     <thead>
                         <tr className="bg-gray-200">
                             <th className="py-2 px-4 border">Total Days</th>
