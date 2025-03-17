@@ -16,6 +16,7 @@ const EmployeeRecords = () => {
   const [presentCount, setPresentCount] = useState(0);
   const [absentCount, setAbsentCount] = useState(0);
   const [isEmployeeIdEnabled, setIsEmployeeIdEnabled] = useState(false);
+  const [attendanceStatusFilter, setAttendanceStatusFilter] = useState("");
 
   useEffect(() => {
     const fetchAttendanceData = async () => {
@@ -66,6 +67,12 @@ const EmployeeRecords = () => {
       );
     }
 
+    if (attendanceStatusFilter) {
+      filtered = filtered.filter(
+        (attendance) => attendance.attendanceStatus === attendanceStatusFilter
+      );
+    }
+
     setFilteredAttendance(filtered);
 
     const distinctDates = new Set(
@@ -82,8 +89,64 @@ const EmployeeRecords = () => {
   const handlePrint = () => {
     const printContent = document.getElementById("attendance-table");
     const windowPrint = window.open("", "", "height=600,width=800");
+
+    // Get the employee name(s) and selected month for the print header
+    const employeeNames = [...new Set(filteredAttendance.map((attendance) => attendance.employee.firstName))];
+    const employeeNameText = employeeNames.length === 1 ? employeeNames[0] : "Employees";
+    const monthName = selectedMonth ? new Date(`2023-${selectedMonth}-01`).toLocaleString('default', { month: 'long' }) : "";
+
+    // Create the print content with the logo, institute name, and header
     windowPrint.document.write("<html><head><title>Attendance Records</title>");
+    windowPrint.document.write(`
+      <style>
+        .print-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 20px;
+        }
+        .print-header img {
+          height: 50px;
+        }
+        .print-header h1 {
+          font-size: 24px;
+          font-weight: bold;
+          text-align: center;
+          flex-grow: 1;
+        }
+        .print-subheader {
+          text-align: center;
+          font-size: 18px;
+          margin-bottom: 20px;
+        }
+        .table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 1rem;
+        }
+        .table th,
+        .table td {
+          padding: 0.75rem;
+          text-align: left;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .table th {
+          background: #f7fafc;
+          color: #4a5568;
+          font-weight: bold;
+        }
+      </style>
+    `);
     windowPrint.document.write("</head><body>");
+    windowPrint.document.write(`
+      <div class="print-header">
+        <img src="path/to/your/logo.png" alt="Logo" />
+        <h1>Indra Institute of Education</h1>
+      </div>
+      <div class="print-subheader">
+        ${monthName ? `${monthName} Month ` : ""}${employeeNameText} Attendance Details
+      </div>
+    `);
     windowPrint.document.write(printContent.innerHTML);
     windowPrint.document.write("</body></html>");
     windowPrint.document.close();
@@ -115,7 +178,7 @@ const EmployeeRecords = () => {
           .filter-container {
             display: flex;
             gap: 1rem;
-            justify-content: space-between;
+            justify-content: center;
             flex-wrap: wrap;
             margin-bottom: 2rem;
           }
@@ -215,9 +278,9 @@ const EmployeeRecords = () => {
       {/* Filter Section */}
       <form onSubmit={handleSearch} className="filter-container">
         {/* Employee ID Filter */}
-        <div className="filter-card">
-          <label htmlFor="employeeId">
-            <FaUser className="text-gray-600" />
+        <div className="filter-card bg-white rounded-lg shadow-md p-4">
+          <label htmlFor="employeeId" className="flex items-center text-gray-700 font-semibold mb-2">
+            <FaUser className="mr-2 text-blue-500" />
             Employee ID
           </label>
           <input
@@ -227,43 +290,45 @@ const EmployeeRecords = () => {
             onChange={(e) => setEmployeeId(e.target.value)}
             placeholder="Enter Employee ID"
             disabled={!isEmployeeIdEnabled && selectedBranch !== ""}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Date Range Filter */}
-        <div className="filter-card">
-          <label htmlFor="startDate">
-            <FaCalendarAlt className="text-gray-600" />
+        <div className="filter-card bg-white rounded-lg shadow-md p-4">
+          <label htmlFor="startDate" className="flex items-center text-gray-700 font-semibold mb-2">
+            <FaCalendarAlt className="mr-2 text-blue-500" />
             Date Range
           </label>
-          <div className="flex gap-4"> {/* Added gap-4 for spacing */}
+          <div className="flex gap-2">
             <input
               type="date"
               id="startDate"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="flex-1" // Ensure inputs take equal space
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="date"
               id="endDate"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="flex-1" // Ensure inputs take equal space
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
         {/* Month Filter */}
-        <div className="filter-card">
-          <label htmlFor="month">
-            <FaCalendarAlt className="text-gray-600" />
+        <div className="filter-card bg-white rounded-lg shadow-md p-4">
+          <label htmlFor="month" className="flex items-center text-gray-700 font-semibold mb-2">
+            <FaCalendarAlt className="mr-2 text-blue-500" />
             Month
           </label>
           <select
             id="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Months</option>
             <option value="01">January</option>
@@ -282,9 +347,9 @@ const EmployeeRecords = () => {
         </div>
 
         {/* Branch Filter */}
-        <div className="filter-card">
-          <label htmlFor="branch">
-            <FaBuilding className="text-gray-600" />
+        <div className="filter-card bg-white rounded-lg shadow-md p-4">
+          <label htmlFor="branch" className="flex items-center text-gray-700 font-semibold mb-2">
+            <FaBuilding className="mr-2 text-blue-500" />
             Branch
           </label>
           <select
@@ -296,6 +361,7 @@ const EmployeeRecords = () => {
                 setIsEmployeeIdEnabled(false);
               }
             }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Branches</option>
             <option value="IIE 100FT Gandhipuram">IIE 100FT Gandhipuram</option>
@@ -304,10 +370,31 @@ const EmployeeRecords = () => {
           </select>
         </div>
 
+        {/* Attendance Status Filter */}
+        <div className="filter-card bg-white rounded-lg shadow-md p-4">
+          <label htmlFor="attendanceStatus" className="flex items-center text-gray-700 font-semibold mb-2">
+            <FaCalendarAlt className="mr-2 text-blue-500" />
+            Attendance Status
+          </label>
+          <select
+            id="attendanceStatus"
+            value={attendanceStatusFilter}
+            onChange={(e) => setAttendanceStatusFilter(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All</option>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+          </select>
+        </div>
+
         {/* Search Button */}
-        <div className="filter-card">
-          <button type="submit" className="search-button">
-            <FaSearch />
+        <div className="filter-card bg-white rounded-lg shadow-md p-4 flex items-end">
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 flex items-center justify-center"
+          >
+            <FaSearch className="mr-2" />
             Search
           </button>
         </div>

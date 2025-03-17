@@ -188,7 +188,7 @@ const LeavePermissionAdmin = ({ setPendingCount, employeeId }) => {
                 <td>
                   <div className="d-flex flex-row align-items-center">
                     <button
-                      className="btn p-0 border-0 bg-transparent mb-2"
+                      className="btn p-0 border-0 bg-transparent"
                       onClick={() =>
                         updateRequestStatus(req.id, "Approved", req.employeeId)
                       }
@@ -196,18 +196,18 @@ const LeavePermissionAdmin = ({ setPendingCount, employeeId }) => {
                       <img
                         src={approve}
                         alt="approve"
-                        style={{ width: "30px", height: "30px" }}
+                        style={{ width: "24px", height: "24px" }}
                       />
                     </button>
 
                     <button
-                      className="btn p-0 border-0 bg-transparent mb-2"
+                      className="btn p-0 border-0 bg-transparent"
                       onClick={() => updateRequestStatus(req.id, "Rejected")}
                     >
                       <img
                         src={rejecte}
                         alt="Reject"
-                        style={{ width: "30px", height: "30px" }}
+                        style={{ width: "24px", height: "24px" }}
                       />
                     </button>
 
@@ -218,7 +218,7 @@ const LeavePermissionAdmin = ({ setPendingCount, employeeId }) => {
                       <img
                         src={pending}
                         alt="Pending"
-                        style={{ width: "30px", height: "30px" }}
+                        style={{ width: "24px", height: "24px" }}
                       />
                     </button>
                   </div>

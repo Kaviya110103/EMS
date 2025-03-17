@@ -1,203 +1,174 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import '../style/Calendar.css';
 
-const Attendance = () => {
-  // State to store the list of attendance records
-  const [attendanceList, setAttendanceList] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAttendance, setSelectedAttendance] = useState(null);
+const LocationCheck = () => {
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
+    const [address, setAddress] = useState('Fetching address...');
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [status, setStatus] = useState('Checking location...');
+    const [showDirections, setShowDirections] = useState(false);
+    const [isRadioDisabled, setIsRadioDisabled] = useState(true); // Initially disabled
 
-  // State to store the current month and year
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // Start with current month (0-11)
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear()); // Start with current year
+    const apiKey = "AIzaSyCOWhjk4Qxz3spiNz2BKgmQqdrO2vE6YL0"; // Replace with your actual API key
+    const locations = {
+        hopes: { lat: 11.026315893948706, lng: 77.01886865153762 },
+        hundredFt: { lat: 11.019751391388388, lng: 76.96291929715497 },
+        kuniyamuthur: { lat: 10.962300680170221, lng: 76.95525099972032 }
+    };
+    const boundaryRadius = 50;
 
-  // Generate all dates for a specific month
-  const getDatesInMonth = (month, year) => {
-    const dates = [];
-    const daysInMonth = new Date(year, month + 1, 0).getDate(); // Get total number of days in the month
-    const firstDay = new Date(year, month, 1).getDay(); // Get the day of the week for the first day of the month
+    useEffect(() => {
+        getCurrentLocation();
+    }, []);
 
-    // Add empty days for the beginning of the month
-    for (let i = 0; i < firstDay; i++) {
-      dates.push(null); // Add nulls to align the days correctly
-    }
+    const getCurrentLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    setLatitude(lat);
+                    setLongitude(lng);
+                    getFormattedAddress(lat, lng);
+                    setIsRadioDisabled(false); // Enable radio buttons after location is fetched
+                },
+                error => {
+                    console.error("Error getting location:", error);
+                    setStatus("⚠️ Unable to fetch location!");
+                }
+            );
+        } else {
+            setStatus("⚠️ Geolocation not supported!");
+        }
+    };
 
-    // Add actual dates
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month, day); // Generate date
-      dates.push(date.toISOString().split('T')[0]); // Format as YYYY-MM-DD
-    }
+    const getFormattedAddress = (lat, lng) => {
+        fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "OK" && data.results.length > 0) {
+                    setAddress(data.results[0].formatted_address);
+                } else {
+                    setAddress("Address not found!");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching address:", error);
+                setAddress("Error fetching address!");
+            });
+    };
 
-    return { dates, firstDay };
-  };
+    const handleBranchSelection = (event) => {
+        const branch = event.target.value;
+        setSelectedLocation(locations[branch]);
+        showMap(locations[branch]);
+    };
 
-  // Fetch attendance data from API
-  const fetchAttendanceData = (month, year) => {
-    axios
-      .get(`http://localhost:8080/api/attendance/employee/1`) // Update with correct employee ID
-      .then((response) => {
-        const attendanceData = response.data; // Assuming the response contains an array of attendance data
-        setAttendanceList(attendanceData);
-      })
-      .catch((error) => {
-        console.error('Error fetching attendance data:', error);
-      });
-  };
+    const showMap = (location) => {
+        if (!location) {
+            alert("Please select a location first!");
+            return;
+        }
 
-  // Fetch attendance data when month or year changes
-  useEffect(() => {
-    fetchAttendanceData(currentMonth, currentYear);
-  }, [currentMonth, currentYear]);
+        const userLocation = { lat: latitude, lng: longitude };
+        const map = new window.google.maps.Map(document.getElementById("map"), {
+            center: location,
+            zoom: 17
+        });
 
-  // Open modal with attendance details
-  const openModal = (attendance) => {
-    setSelectedAttendance(attendance);
-    setIsModalOpen(true);
-  };
+        new window.google.maps.Circle({
+            strokeColor: "#008000",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#008000",
+            fillOpacity: 0.35,
+            map,
+            center: location,
+            radius: boundaryRadius
+        });
 
-  // Close the modal
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedAttendance(null);
-  };
+        new window.google.maps.Marker({
+            position: userLocation,
+            map: map,
+            title: "Your Location"
+        });
 
-  // Go to the previous month
-  const goToPreviousMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11); // December
-      setCurrentYear(currentYear - 1); // Previous year
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
-  };
+        checkInsideBoundary(latitude, longitude, location);
+    };
 
-  // Go to the next month
-  const goToNextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0); // January
-      setCurrentYear(currentYear + 1); // Next year
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
-  };
+    const checkInsideBoundary = (lat, lng, location) => {
+        const distance = haversineDistance(lat, lng, location.lat, location.lng);
 
-  // Create an array of dates for the selected month
-  const { dates, firstDay } = getDatesInMonth(currentMonth, currentYear);
+        if (distance <= boundaryRadius) {
+            setStatus("✅ You are inside the selected location.");
+            setShowDirections(false);
+        } else {
+            setStatus("❌ You are outside the selected location.");
+            setShowDirections(true);
+        }
+    };
 
-  return (
-    <div className="calendar-container">
-      <h2>Employee Attendance</h2>
+    const haversineDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3;
+        const toRad = angle => (Math.PI / 180) * angle;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
 
-      {/* Navigation Buttons */}
-      <div className="calendar-nav">
-        <button onClick={goToPreviousMonth}>Previous Month</button>
-        <span>{`${currentYear}-${currentMonth + 1}`}</span>
-        <button onClick={goToNextMonth}>Next Month</button>
-      </div>
+    const openDirections = () => {
+        window.open(`https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${selectedLocation.lat},${selectedLocation.lng}&travelmode=walking`, "_blank");
+    };
 
-      {/* Calendar Grid */}
-      <div className="calendar-grid">
-        {/* Calendar Header (Day Names) */}
-        <div className="calendar-header">
-          <div className="day">Sun</div>
-          <div className="day">Mon</div>
-          <div className="day">Tue</div>
-          <div className="day">Wed</div>
-          <div className="day">Thu</div>
-          <div className="day">Fri</div>
-          <div className="day">Sat</div>
-        </div>
+    return (
+        <div>
+            <h2>Your Current Location:</h2>
+            <p>Latitude: {latitude}, Longitude: {longitude}</p>
+            <h3>Formatted Address:</h3>
+            <p>{address}</p>
 
-        {/* Calendar Days */}
-        <div className="calendar-days">
-          {dates.map((date, index) => (
-            <div
-              key={index}
-              className={`calendar-day ${date ? '' : 'empty'}`}
-              style={{
-                backgroundColor: date && attendanceList.some(
-                  (item) => item.dateIn === date
-                )
-                  ? '#f1f1f1'
-                  : '#e0e0e0', // Grey if no attendance
-              }}
-              onClick={() => date && openModal(attendanceList.find(
-                (item) => item.dateIn === date
-              ))}
-            >
-              {date ? (
-                <>
-                  <p>{date.split('-')[2]}</p> {/* Day of the month */}
-                  <p>
-                    {attendanceList.some((item) => item.dateIn === date)
-                      ? 'Present'
-                      : 'No Data'}
-                  </p>
-                </>
-              ) : (
-                <p>&nbsp;</p> // Empty cell for non-existing days
-              )}
+            <h3>Select Your Branch Location:</h3>
+            <div style={{ marginTop: "15px" }}>
+                <label>
+                    <input
+                        type="radio"
+                        name="branch"
+                        value="hopes"
+                        onChange={handleBranchSelection}
+                        disabled={isRadioDisabled} // Disabled based on state
+                    /> Hopes
+                </label>
+                <label style={{ marginLeft: "15px" }}>
+                    <input
+                        type="radio"
+                        name="branch"
+                        value="hundredFt"
+                        onChange={handleBranchSelection}
+                        disabled={isRadioDisabled} // Disabled based on state
+                    /> 100ft
+                </label>
+                <label style={{ marginLeft: "15px" }}>
+                    <input
+                        type="radio"
+                        name="branch"
+                        value="kuniyamuthur"
+                        onChange={handleBranchSelection}
+                        disabled={isRadioDisabled} // Disabled based on state
+                    /> Kuniyamuthur
+                </label>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Modal for displaying full attendance details */}
-      {isModalOpen && selectedAttendance && (
-        <div
-          id="attendanceModal"
-          className="modal"
-          style={{
-            display: 'block',
-            position: 'fixed',
-            zIndex: '1',
-            left: '0',
-            top: '0',
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-            paddingTop: '60px',
-          }}
-        >
-          <div
-            className="modal-content"
-            style={{
-              backgroundColor: 'white',
-              margin: '5% auto',
-              padding: '20px',
-              border: '1px solid #888',
-              width: '80%',
-            }}
-          >
-            <span
-              className="close"
-              style={{
-                color: '#aaa',
-                float: 'right',
-                fontSize: '28px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
-              onClick={closeModal}
-            >
-              &times;
-            </span>
-            <h3>Attendance Details</h3>
-            <p>
-              <strong>Time In:</strong> {selectedAttendance.timeIn}
-            </p>
-            <p>
-              <strong>Time Out:</strong> {selectedAttendance.timeOut}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedAttendance.attendanceStatus}
-            </p>
-          </div>
+            <h4 style={{ color: status.includes("✅") ? "green" : "red" }}>{status}</h4>
+            {showDirections && (
+                <button id="directions" onClick={openDirections}>🚀 Get Directions</button>
+            )}
+            <div id="map" style={{ width: '100%', height: '400px', marginTop: '20px' }}></div>
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
-export default Attendance;
+export default LocationCheck;
