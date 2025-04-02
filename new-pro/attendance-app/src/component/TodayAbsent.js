@@ -77,7 +77,7 @@ const AbsenteesTable = () => {
 
                 // Automatically mark as absent if no record by 2 PM
                 const currentTime = new Date();
-                if (currentTime.getHours() >= 13) { // 2 PM is 14:00 in 24-hour format
+                if (currentTime.getHours() >= 19) { // 2 PM is 14:00 in 24-hour format
                     absentees.forEach(async (employee) => {
                         if (employee.status === 'No record for today') {
                             await handleMarkAbsent(employee.employeeId);
