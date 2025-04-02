@@ -29,9 +29,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:19000", "http://localhost:8081",    "exp://192.168.1.24:8081", "http://192.168.1.24:8081"})
+// @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:19000", "http://localhost:8081",    "exp://192.168.1.24:8081", "http://192.168.1.24:8081"})
+
+
 @RestController
 @RequestMapping("/api/images")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ClientController {
     @Autowired
     private ImageService imageService;
@@ -63,7 +66,7 @@ public class ClientController {
 
    
     @PostMapping("/uploadImage1")
-    @CrossOrigin(origins = "http://localhost:3000")
+    // @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> uploadImage1(
             @RequestParam("image1") MultipartFile file1,
             @RequestParam("employeeId") Long employeeId,
@@ -163,7 +166,7 @@ public class ClientController {
     // Display the first image by ID
    
     @PostMapping("/uploadImage2/{id}")
-    @CrossOrigin(origins = "http://localhost:3000") // Allow React app to access this API
+    // @CrossOrigin(origins = "http://localhost:3000") // Allow React app to access this API
     public ResponseEntity<String> uploadImage2(
             @PathVariable("id") Long id,
             @RequestParam("image2") MultipartFile file2) throws IOException, SQLException {

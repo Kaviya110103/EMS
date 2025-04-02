@@ -6,14 +6,21 @@ import TimeOut from './TimeOut';
 import UploadImageModal from './UploadImageModal';
 import UploadImage2Modal from './UploadImage2Modal';
 import DayClose from './DayCloseModal';
+import LocationSelector from './LocationSelector';
 
 const SimpleAttendanceDetails = ({ employeeId }) => {
   const [attendanceDetails, setAttendanceDetails] = useState(null);
-  const [images, setImages] = useState(null); // Store image details
+  const [images, setImages] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState('');
   const [latestAttendanceId, setLatestAttendanceId] = useState(null);
   const [showTimeIn, setShowTimeIn] = useState(false);
+  const [isInsideLocation, setIsInsideLocation] = useState(false); // Track location status
+
+  // Callback function to receive location status from LocationSelector
+  const handleLocationStatusChange = (isInside) => {
+    setIsInsideLocation(isInside);
+  };
 
   useEffect(() => {
     const fetchAttendanceData = async () => {
@@ -25,7 +32,7 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
           const lastAttendance = response.data[response.data.length - 1];
           setAttendanceDetails(lastAttendance);
           setLatestAttendanceId(lastAttendance.id);
-          fetchImagesByAttendanceId(lastAttendance.id); // Fetch images for the latest attendance
+          fetchImagesByAttendanceId(lastAttendance.id);
         }
       } catch (error) {
         console.error('Error fetching attendance data:', error);
@@ -38,7 +45,7 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
           `http://localhost:8080/api/images/displayImagesByAttendanceId/${attendanceId}`
         );
         if (response.data) {
-          setImages(response.data); // Set image details
+          setImages(response.data);
         }
       } catch (error) {
         console.error('Error fetching images:', error);
@@ -84,38 +91,26 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
     );
   };
 
-  const showStartDayButton = !isToday(attendanceDetails.dateIn) && !showTimeIn;
+  const showStartDayButton = !isToday(attendanceDetails.dateIn) && !showTimeIn && isInsideLocation;
 
   const shouldShowUploadImageModal =
-    attendanceDetails.timeIn && // If timeIn exists
-    !images?.imageUrl1; // But imageUrl1 (TimeIn image) does not exist
+    attendanceDetails.timeIn && !images?.imageUrl1;
 
   const shouldShowTimeOut =
-    attendanceDetails.timeIn && // If timeIn exists
-    images?.imageUrl1 && // If TimeIn image exists
-    !attendanceDetails.timeOut; // But timeOut is NOT recorded
+    attendanceDetails.timeIn && images?.imageUrl1 && !attendanceDetails.timeOut;
 
   const shouldShowUploadImage2Modal =
-    attendanceDetails.timeIn && // If timeIn exists
-    images?.imageUrl1 && // If TimeIn image exists
-    attendanceDetails.timeOut && // If timeOut exists
-    !images?.imageUrl2; // But imageUrl2 (TimeOut image) does not exist
+    attendanceDetails.timeIn && images?.imageUrl1 && attendanceDetails.timeOut && !images?.imageUrl2;
 
-    const shouldShowDayClose =
+  const shouldShowDayClose =
     attendanceDetails.timeIn &&
     images?.imageUrl1 &&
     attendanceDetails.timeOut &&
     images?.imageUrl2 &&
     isToday(attendanceDetails.dateIn);
 
-
-
   return (
     <div className="attendance-details-card">
-    
-  
-  
-  
       <div className="attendance-status pt-5">
         Attendance Status: {attendanceDetails.attendanceStatus || 'Not Available'}
       </div>
@@ -123,13 +118,11 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
       <div className="attendance-images m-5">
         <div className="image-column">
           <strong>TimeIn:</strong> {formatTime(attendanceDetails.timeIn)}
-
           {images?.imageUrl1 && (
             <div className="image-container" onClick={() => handleImageClick(images.imageUrl1)}>
               <img src={images.imageUrl1} alt="Image 1" className="attendance-image" />
             </div>
           )}
-
           <div className="attendance-date">
             <strong>Date:</strong> {attendanceDetails.dateIn ? new Date(attendanceDetails.dateIn).toLocaleDateString() : 'Not Available'}
           </div>
@@ -137,13 +130,11 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
 
         <div className="image-column">
           <strong>TimeOut:</strong> {formatTime(attendanceDetails.timeOut)}
-
           {images?.imageUrl2 && (
             <div className="image-container" onClick={() => handleImageClick(images.imageUrl2)}>
               <img src={images.imageUrl2} alt="Image 2" className="attendance-image" />
             </div>
           )}
-
           <div className="attendance-date">
             <strong>Date:</strong> {attendanceDetails.dateIn ? new Date(attendanceDetails.dateIn).toLocaleDateString() : 'Not Available'}
           </div>
@@ -158,12 +149,14 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
         </div>
       )}
 
-      {showStartDayButton && (
-              <div className="d-flex justify-content-center align-items-center">
+      {/* Pass the callback to LocationSelector */}
+      <LocationSelector onLocationStatusChange={handleLocationStatusChange} />
 
-        <button onClick={handleStartDayClick} className="button-33">
-          Start Day
-        </button>
+      {showStartDayButton && (
+        <div className="d-flex justify-content-center align-items-center">
+          <button onClick={handleStartDayClick} className="button-33">
+            Start Day
+          </button>
         </div>
       )}
 
@@ -176,7 +169,6 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
           employeeId={employeeId}
           attendanceId={latestAttendanceId}
           imageId={null}
-
         />
       )}
 
@@ -186,22 +178,22 @@ const SimpleAttendanceDetails = ({ employeeId }) => {
 
       {shouldShowUploadImage2Modal && (
         <UploadImage2Modal
-          imageId={images?.imageId} // Pass the imageId from the API response
-          attendanceId={latestAttendanceId} // Pass the attendanceId if needed
+          imageId={images?.imageId}
+          attendanceId={latestAttendanceId}
         />
       )}
 
       {shouldShowDayClose && (
         <DayClose
-        employeeId={employeeId}
-        attendanceId={latestAttendanceId}
-        timeIn={attendanceDetails.timeIn}
-        timeOut={attendanceDetails.timeOut}
-        DateIn={attendanceDetails.dateIn}
-        TimeInImage={images.imageUrl1}
-        TimeOutImage={images.imageUrl2}
-
-         />)}
+          employeeId={employeeId}
+          attendanceId={latestAttendanceId}
+          timeIn={attendanceDetails.timeIn}
+          timeOut={attendanceDetails.timeOut}
+          DateIn={attendanceDetails.dateIn}
+          TimeInImage={images.imageUrl1}
+          TimeOutImage={images.imageUrl2}
+        />
+      )}
     </div>
   );
 };

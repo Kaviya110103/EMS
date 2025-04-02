@@ -63,6 +63,7 @@ function App() {
 
 
 
+
            {/* <Route path="/add-attendance" element={<AddAttendance />} /> */}
            <Route path="/" exact component={Clock} />
     

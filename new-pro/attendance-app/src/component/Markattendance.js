@@ -5,6 +5,7 @@ import DateTimeCard from './DateTimeCard';
 import AttendanceDetails from './AttendanceDetails';
 import LeavePermissionEmployee from './LeavePermissionEmployee';
 import EmployeeCalender from './EmployeeCalender';
+// import LocationSelector from './LocationSelector';
 import '../style/Clock.css'; // Import CSS for styling
 import logo from '../images/logo.png'; // Adjust the path as per your project structure
 import axios from 'axios';
@@ -143,12 +144,14 @@ function Markattendance() {
           <>
             <div className="col-10 mb-2" style={{ backgroundColor: '#ffffff', borderRadius: '10px' }}>
               <MarkEmployee employee={employee} />
+              
             </div>
             <div className="col-10 bg-light mb-2" style={{ borderRadius: '10px' }}>
               <DateTimeCard />
             </div>
             <div className="col-10">
               <AttendanceDetails employeeId={employeeId} onAttendanceIdChange={handleAttendanceId} />
+              {/* <LocationSelector /> */}
             </div>
           </>
         )}
@@ -167,6 +170,8 @@ function Markattendance() {
           </div>
         )}
       </div>
+  
+
     </div>
   );
 }

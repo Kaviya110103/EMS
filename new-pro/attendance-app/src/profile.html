@@ -1,62 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Current Location Address</title>
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places" async defer></script>
-  <script>
-    function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
-    }
-
-    function showPosition(position) {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-
-      // Use Google Maps Geocoding API to convert coordinates to address
-      const geocoder = new google.maps.Geocoder();
-      const latLng = new google.maps.LatLng(lat, lon);
-
-      geocoder.geocode({ 'location': latLng }, function(results, status) {
-        if (status === google.maps.GeocoderStatus.OK) {
-          if (results[0]) {
-            document.getElementById("address").innerText = "Current Address: " + results[0].formatted_address;
-          } else {
-            alert("No address found");
-          }
-        } else {
-          alert("Geocoder failed due to: " + status);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Check - Select a Branch</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
         }
-      });
-    }
-
-    function showError(error) {
-      switch(error.code) {
-        case error.PERMISSION_DENIED:
-          alert("User denied the request for Geolocation.");
-          break;
-        case error.POSITION_UNAVAILABLE:
-          alert("Location information is unavailable.");
-          break;
-        case error.TIMEOUT:
-          alert("The request to get user location timed out.");
-          break;
-        case error.UNKNOWN_ERROR:
-          alert("An unknown error occurred.");
-          break;
-      }
-    }
-  </script>
+        #status {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        #directions {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #directions:hover {
+            background-color: #0056b3;
+        }
+        .location-options {
+            margin-top: 15px;
+        }
+        .location-options label {
+            font-size: 16px;
+            margin-right: 15px;
+        }
+    </style>
 </head>
-<body onload="getLocation()">
+<body onload="getCurrentLocation()">
+    <h2>Your Current Location:</h2>
+    <p id="latlong">Fetching location...</p>
+    <h3>Formatted Address:</h3>
+    <p id="address">Fetching address...</p>
 
-  <h1>Get Current Location Address</h1>
-  <p id="address">Loading your current address...</p>
+    <h3>Select Your Branch Location:</h3>
+    <div class="location-options">
+        <label><input type="radio" name="branch" value="hopes"> Hopes</label>
+        <label><input type="radio" name="branch" value="hundredFt"> 100ft</label>
+        <label><input type="radio" name="branch" value="kuniyamuthur"> Kuniyamuthur</label>
+    </div>
+    <button onclick="setBranchLocation()">Set Location</button>
+
+    <h4 id="status">Checking location...</h4>
+    <button id="directions" onclick="openDirections()">🚀 Get Directions</button>
+    <div id="map"></div>
+
+    <script>
+        const apiKey = "AIzaSyCOWhjk4Qxz3spiNz2BKgmQqdrO2vE6YL0"; // Replace with your actual API key
+        let map, marker, latitude, longitude, selectedLocation;
+        const locations = {
+            hopes: { lat: 11.026315893948706, lng: 77.01886865153762 },
+            hundredFt: { lat: 11.019751391388388, lng: 76.96291929715497 },
+            kuniyamuthur: { lat: 10.962300680170221, lng: 76.95525099972032 }
+        };
+        const boundaryRadius = 50;
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        latitude = position.coords.latitude;
+                        longitude = position.coords.longitude;
+                        document.getElementById("latlong").innerText = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                        getFormattedAddress(latitude, longitude);
+                    },
+                    error => {
+                        console.error("Error getting location:", error);
+                        document.getElementById("latlong").innerText = "Unable to fetch location!";
+                        document.getElementById("status").innerText = "⚠️ Unable to fetch location!";
+                    }
+                );
+            } else {
+                document.getElementById("latlong").innerText = "Geolocation is not supported!";
+                document.getElementById("status").innerText = "⚠️ Geolocation not supported!";
+            }
+        }
+
+        function setBranchLocation() {
+            const selectedRadio = document.querySelector('input[name="branch"]:checked');
+            if (!selectedRadio) {
+                alert("Please select a branch location!");
+                return;
+            }
+
+            selectedLocation = locations[selectedRadio.value];
+            showMap();
+        }
+
+        function getFormattedAddress(lat, lng) {
+            fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "OK" && data.results.length > 0) {
+                        document.getElementById("address").innerText = data.results[0].formatted_address;
+                    } else {
+                        document.getElementById("address").innerText = "Address not found!";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching address:", error);
+                    document.getElementById("address").innerText = "Error fetching address!";
+                });
+        }
+
+        function showMap() {
+            if (!selectedLocation) {
+                alert("Please select a location first!");
+                return;
+            }
+
+            const userLocation = { lat: latitude, lng: longitude };
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: selectedLocation,
+                zoom: 17
+            });
+
+            new google.maps.Circle({
+                strokeColor: "#008000",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#008000",
+                fillOpacity: 0.35,
+                map,
+                center: selectedLocation,
+                radius: boundaryRadius
+            });
+
+            marker = new google.maps.Marker({
+                position: userLocation,
+                map: map,
+                title: "Your Location"
+            });
+
+            checkInsideBoundary(latitude, longitude);
+        }
+
+        function checkInsideBoundary(lat, lng) {
+            const distance = haversineDistance(lat, lng, selectedLocation.lat, selectedLocation.lng);
+            const statusElement = document.getElementById("status");
+            const directionsButton = document.getElementById("directions");
+
+            if (distance <= boundaryRadius) {
+                statusElement.innerText = "✅ You are inside the selected location.";
+                statusElement.style.color = "green";
+                directionsButton.style.display = "none"; 
+            } else {
+                statusElement.innerText = "❌ You are outside the selected location.";
+                statusElement.style.color = "red";
+                directionsButton.style.display = "block"; 
+            }
+        }
+
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3;
+            const toRad = angle => (Math.PI / 180) * angle;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function openDirections() {
+            window.open(`https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${selectedLocation.lat},${selectedLocation.lng}&travelmode=walking`, "_blank");
+        }
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOWhjk4Qxz3spiNz2BKgmQqdrO2vE6YL0&libraries=places" async defer></script>
 
 </body>
 </html>

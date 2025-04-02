@@ -57,6 +57,9 @@ function EmployeeAttendanceSalary() {
         }
     };
 
+
+    
+
     const calculateTotalDays = (month, year) => new Date(year, month, 0).getDate();
 
     const calculateAttendance = () => {
@@ -78,7 +81,7 @@ function EmployeeAttendanceSalary() {
     const calculateWorkingDays = () => setWorkingDays(totalDays - absentDays - weekOffDays);
     const calculateSalary = () => {
         if (totalDays > 0) {
-            setDailySalary(employeeSalary / totalDays);
+            setDailySalary(employeeSalary / 30);
         }
         setSalary(dailySalary * presentDays);
     };

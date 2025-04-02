@@ -53,9 +53,9 @@ const LeavePermissionEmployee = ({ employeeId, attendanceId }) => {
     }
   
     try {
-      // Add the attendanceId to the endpoint URL
+      // Replace attendanceId with employeeId in the endpoint URL
       const response = await fetch(
-        `http://localhost:8080/api/leave-permissions/${attendanceId}`,
+        `http://localhost:8080/api/leave-permissions/${employeeId}`,
         {
           method: "POST",
           headers: {
@@ -84,6 +84,7 @@ const LeavePermissionEmployee = ({ employeeId, attendanceId }) => {
       console.error("Error creating request:", error);
     }
   };
+  
   
 
   return (

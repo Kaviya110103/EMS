@@ -17,9 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:19000", "http://localhost:8081",    "exp://192.168.1.24:8081", "http://192.168.1.24:8081"})
+
 @RestController
 @RequestMapping("/api/attendance")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AttendanceController {
 
     @Autowired
@@ -35,8 +36,9 @@ public class AttendanceController {
     public Attendance timeIn(@RequestBody Map<String, String> payload) {
         Long employeeId = Long.parseLong(payload.get("employeeId"));
         String attendanceStatus = payload.get("attendanceStatus");
+        String location = payload.get("location");
 
-        return attendanceService.timeIn(employeeId, attendanceStatus); // Save employeeId and attendanceStatus
+        return attendanceService.timeIn(employeeId, attendanceStatus,location); // Save employeeId and attendanceStatus
     }
 
     // Time Out endpoint
@@ -127,7 +129,7 @@ public class AttendanceController {
         return ResponseEntity.ok("Attendance record created successfully!");
     }
 
- // POST request to update the 'dayStatus' for a particular attendance ID
+ // payroll status ... number of days calucualte
 
  @PostMapping("/updateDayStatus/{id}")
  public ResponseEntity<String> updateDayStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {

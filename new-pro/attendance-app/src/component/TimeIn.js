@@ -67,7 +67,7 @@ const TimeIn = ({ employeeId, onTimeIn }) => {
 
     try {
       const payload = {
-        employeeId: employeeId.toString(),
+        employeeId: 12,
         attendanceStatus: selectedStatus,
       };
 

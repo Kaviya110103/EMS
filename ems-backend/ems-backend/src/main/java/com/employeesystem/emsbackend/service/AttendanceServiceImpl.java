@@ -27,7 +27,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     private ImageRepository imageRepository;
 
     @Override
-    public Attendance timeIn(Long employeeId, String attendanceStatus) {
+    public Attendance timeIn(Long employeeId, String attendanceStatus , String location) {
         // Fetch the employee by ID
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
