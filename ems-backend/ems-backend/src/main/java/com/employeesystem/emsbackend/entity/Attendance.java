@@ -28,8 +28,11 @@ public class Attendance {
     @Column(name = "attendance_status")  // New field added
     private String attendanceStatus;
 
+
+    @Column(name ="location")
+    private String location;
     @Column(name = "day_status")  // New dayStatus field
-    
+
     private String dayStatus;
 
     // Default constructor
@@ -110,5 +113,11 @@ public class Attendance {
         this.timeOut = timeOut;
         this.attendanceStatus = attendanceStatus;
         this.dayStatus = dayStatus;
+    }
+
+    public Attendance orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    
     }
 }

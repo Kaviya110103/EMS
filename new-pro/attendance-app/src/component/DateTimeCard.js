@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../style/DateTimeCard.css'; // Import the CSS file
+import TimeIn from './TimeIn';
 
 const DateTimeCard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -36,7 +37,7 @@ const DateTimeCard = () => {
       {/* Right side: Date and Day */}
       <div className="date-day-container">
         <div className="date-string">
-          {dateString}
+          {dateString}  <TimeIn  />
         </div>
         <div className="day-string">
           {dayString}

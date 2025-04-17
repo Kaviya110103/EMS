@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import approve from "../images/mark.png";
 import rejecte from "../images/remove.png";
 import pending from "../images/wall-clock.png";
+import "./LeavePermissionAdmin.css"; // Import the custom CSS file
 
 const LeavePermissionAdmin = ({ setPendingCount, employeeId }) => {
   const [requests, setRequests] = useState([]);
   const [isDayClosed, setIsDayClosed] = useState(false);
   const [attendanceData, setAttendanceData] = useState(null);
-  const [attendanceId, setAttendanceId] = useState(null); // Declare state
+  const [attendanceId, setAttendanceId] = useState(null);
   const [selectedBranch, setSelectedBranch] = useState(""); // State for selected branch
 
   useEffect(() => {
@@ -104,75 +105,49 @@ const LeavePermissionAdmin = ({ setPendingCount, employeeId }) => {
     <div className="container mt-5 leave-permission-admin">
       <h3 className="text-center mb-4">Leave and Permission Requests</h3>
 
-      <div className="form-group mb-4">
-        <label>Filter by Branch</label>
-        <fieldset className="bg-light p-3 d-flex flex-row">
-          <div className="form-check me-3">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="branch"
-              value=""
-              id="branchAll"
-              onChange={() => handleBranchChange('')}
-              checked={selectedBranch === ''}
-              style={{ display: 'block' }}
-            />
-            <label className="form-check-label" htmlFor="branchAll" style={{ cursor: 'pointer' }}>
-              All Branches
-            </label>
-          </div>
-          <div className="form-check me-3">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="branch"
-              value="IIE 100FT Gandhipuram"
-              id="branch1"
-              onChange={() => handleBranchChange("IIE 100FT Gandhipuram")}
-              checked={selectedBranch === "IIE 100FT Gandhipuram"}
-              style={{ display: 'block' }}
-            />
-            <label className="form-check-label" htmlFor="branch1" style={{ cursor: 'pointer' }}>
-              IIE, 100 FT
-            </label>
-          </div>
-          <div className="form-check me-3">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="branch"
-              value="IIE Kuniyamuthur"
-              id="branch2"
-              onChange={() => handleBranchChange("IIE Kuniyamuthur")}
-              checked={selectedBranch === "IIE Kuniyamuthur"}
-              style={{ display: 'block' }}
-            />
-            <label className="form-check-label" htmlFor="branch2" style={{ cursor: 'pointer' }}>
-              IIE, Kuniyamuthur
-            </label>
-          </div>
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="branch"
-              value="IIE Hopes"
-              id="branch3"
-              onChange={() => handleBranchChange("IIE Hopes")}
-              checked={selectedBranch === "IIE Hopes"}
-              style={{ display: 'block' }}
-            />
-            <label className="form-check-label" htmlFor="branch3" style={{ cursor: 'pointer' }}>
-              IIE Hopes
-            </label>
-          </div>
-        </fieldset>
+      {/* Branch Selection Cards */}
+      <div className="branch-cards">
+        <div
+          className={`branch-card ${selectedBranch === "" ? "active" : ""}`}
+          onClick={() => handleBranchChange("")}
+        >
+          <div className="branch-icon">🏢</div>
+          <div className="branch-label">All Branches</div>
+        </div>
+        <div
+          className={`branch-card ${
+            selectedBranch === "IIE 100FT Gandhipuram" ? "active" : ""
+          }`}
+          onClick={() => handleBranchChange("IIE 100FT Gandhipuram")}
+        >
+          <div className="branch-icon">🏛️</div>
+          <div className="branch-label">IIE, 100 FT</div>
+        </div>
+        <div
+          className={`branch-card ${
+            selectedBranch === "IIE Kuniyamuthur" ? "active" : ""
+          }`}
+          onClick={() => handleBranchChange("IIE Kuniyamuthur")}
+        >
+          <div className="branch-icon">🏫</div>
+          <div className="branch-label">IIE, Kuniyamuthur</div>
+        </div>
+        <div
+          className={`branch-card ${
+            selectedBranch === "IIE Hopes" ? "active" : ""
+          }`}
+          onClick={() => handleBranchChange("IIE Hopes")}
+        >
+          <div className="branch-icon">🏢</div>
+          <div className="branch-label">IIE Hopes</div>
+        </div>
       </div>
 
+
+
+      {/* Requests Table */}
       <div className="table-section">
         <h4>All Leave and Permission Requests</h4>
-        <h3>Latest Attendance ID: {attendanceId}</h3>
         <table className="table table-striped table-hover">
           <thead>
             <tr>
@@ -189,70 +164,69 @@ const LeavePermissionAdmin = ({ setPendingCount, employeeId }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredRequests.map((req) => (
-              <tr key={req.id}>
-                <td>{req.id}</td>
-                <td>{req.attendance.employee.branch}</td>
-                <td>{req.employeeId}</td>
-                <td>{req.type}</td>
-                <td>{req.leaveType || "N/A"}</td>
-                <td>{req.startDate}</td>
-                <td>{req.endDate}</td>
-                <td>{req.reason}</td>
-                <td>
-                  <span
-                    className={`badge ${
-                      req.status === "Pending"
-                        ? "bg-primary"
-                        : req.status === "Rejected"
-                        ? "bg-danger"
-                        : "bg-success"
-                    }`}
-                  >
-                    {req.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="d-flex flex-row align-items-center">
-                    <button
-                      className="btn p-0 border-0 bg-transparent mb-2"
-                      onClick={() =>
-                        updateRequestStatus(req.id, "Approved", req.employeeId)
-                      }
-                    >
-                      <img
-                        src={approve}
-                        alt="approve"
-                        style={{ width: "30px", height: "30px" }}
-                      />
-                    </button>
+  {filteredRequests.map((req) => (
+    <tr key={req.id}>
+      <td>{req.id}</td>
+      <td>{req.attendance?.employee?.branch || "N/A"}</td> {/* Safe access */}
+      <td>{req.employeeId}</td>
+      <td>{req.type}</td>
+      <td>{req.leaveType || "N/A"}</td>
+      <td>{req.startDate}</td>
+      <td>{req.endDate}</td>
+      <td>{req.reason}</td>
+      <td>
+        <span
+          className={`badge ${
+            req.status === "Pending"
+              ? "bg-primary"
+              : req.status === "Rejected"
+              ? "bg-danger"
+              : "bg-success"
+          }`}
+        >
+          {req.status}
+        </span>
+      </td>
+      <td>
+        <div className="d-flex flex-row align-items-center">
+          <button
+            className="btn p-0 border-0 bg-transparent"
+            onClick={() => updateRequestStatus(req.id, "Approved", req.employeeId)}
+          >
+            <img
+              src={approve}
+              alt="approve"
+              style={{ width: "24px", height: "24px" }}
+            />
+          </button>
 
-                    <button
-                      className="btn p-0 border-0 bg-transparent mb-2"
-                      onClick={() => updateRequestStatus(req.id, "Rejected")}
-                    >
-                      <img
-                        src={rejecte}
-                        alt="Reject"
-                        style={{ width: "30px", height: "30px" }}
-                      />
-                    </button>
+          <button
+            className="btn p-0 border-0 bg-transparent"
+            onClick={() => updateRequestStatus(req.id, "Rejected")}
+          >
+            <img
+              src={rejecte}
+              alt="Reject"
+              style={{ width: "24px", height: "24px" }}
+            />
+          </button>
 
-                    <button
-                      className="btn p-0 border-0 bg-transparent"
-                      onClick={() => updateRequestStatus(req.id, "Pending")}
-                    >
-                      <img
-                        src={pending}
-                        alt="Pending"
-                        style={{ width: "30px", height: "30px" }}
-                      />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          <button
+            className="btn p-0 border-0 bg-transparent"
+            onClick={() => updateRequestStatus(req.id, "Pending")}
+          >
+            <img
+              src={pending}
+              alt="Pending"
+              style={{ width: "24px", height: "24px" }}
+            />
+          </button>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
         </table>
       </div>
     </div>

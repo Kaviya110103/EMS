@@ -125,14 +125,21 @@ public class EmployeeController {
                                                        @RequestParam("file") MultipartFile file) {
         try {
             Employee updatedEmployee = employeeService.uploadProfileImage(id, file);
+            
+            // Construct full URL for the profile image
+            String baseUrl = "http://192.168.1.36:8080"; // Replace with your actual backend IP
+            updatedEmployee.setProfileImage(baseUrl + "/" + updatedEmployee.getProfileImage().replace("\\", "/"));
+            
             return ResponseEntity.ok(updatedEmployee);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    
 
     @PostMapping("/authenticate")
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:19000", "http://localhost:8081",    "exp://192.168.1.14:8081", "http://192.168.1.5:8080"}) // Allow React Web & React Native
+    
     public ResponseEntity<Employee> authenticateEmployee(@RequestBody Employee loginDetails) {
         try {
             Employee employee = employeeService.authenticateEmployee(loginDetails.getUsername(), loginDetails.getPassword());

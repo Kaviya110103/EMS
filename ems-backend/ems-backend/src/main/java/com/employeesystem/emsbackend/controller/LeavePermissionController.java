@@ -40,23 +40,23 @@ public class LeavePermissionController {
 
 
     // Create a new leave or permission request
-    @PostMapping("/{attendanceId}")
+    @PostMapping("/{employeeId}")
     public ResponseEntity<?> createLeavePermission(
-            @PathVariable Long attendanceId,
+            @PathVariable String employeeId,
             @RequestBody LeavePermission leavePermission) {
         try {
-            Attendance attendance = attendanceRepository.findById(attendanceId)
-                    .orElseThrow(() -> new RuntimeException("Attendance not found with id: " + attendanceId));
-
-            leavePermission.setAttendance(attendance);
-
+            // Set the employeeId in the LeavePermission entity
+            leavePermission.setEmployeeId(employeeId);
+    
+            // Save the leave permission record
             LeavePermission savedLeavePermission = leavePermissionRepository.save(leavePermission);
-
+    
             return ResponseEntity.status(HttpStatus.CREATED).body(savedLeavePermission);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving leave permission: " + e.getMessage());
         }
     }
+    
     
     @GetMapping("/attendance/{attendanceId}")
     public List<LeavePermission> getLeavePermissionsByAttendanceId(@PathVariable Long attendanceId) {

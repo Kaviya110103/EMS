@@ -27,6 +27,8 @@ import Demo from './component/Demo';
 import CheckAttendance from './component/CheckAttendance';
 import Payroll from './component/Payroll';
 import LeavePermissionManager from './component/LeavePermissionManager';
+import EmployeeCalender from './component/EmployeeCalender';
+
 import EnterAttendance from './component/EnterAttendance';
 // import EmpProfile from './components/EmpProfile'
 
@@ -61,6 +63,7 @@ function App() {
 
 
 
+
            {/* <Route path="/add-attendance" element={<AddAttendance />} /> */}
            <Route path="/" exact component={Clock} />
     
@@ -74,6 +77,8 @@ function App() {
           <Route path="/EmployeePage" element={<EmployeePage/>} />
           <Route path="/check" element={<CheckAttendance/>} />
           <Route path="/payroll" element={<Payroll/>}/>
+          <Route path="/EmployeeCalender" element={<EmployeeCalender/>}/>
+
           <Route path="/enterattendance" element={<EnterAttendance/>}/>
 
 

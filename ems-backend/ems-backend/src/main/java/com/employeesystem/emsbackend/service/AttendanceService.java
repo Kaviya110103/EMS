@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface AttendanceService {
 
-    Attendance timeIn(Long employeeId, String attendanceStatus);
+    Attendance timeIn(Long employeeId, String attendanceStatus, String location);
 
     Attendance timeOut(Long id);
 
@@ -34,5 +34,7 @@ public interface AttendanceService {
     Attendance getLastAttendanceByEmployeeId(Long employeeId);
 
     boolean updateDayStatus(Long attendanceId, String dayStatus);
+
+    boolean isDayStatusCompleted(Long employeeId, Long attendanceId);
 
 }

@@ -27,7 +27,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     private ImageRepository imageRepository;
 
     @Override
-    public Attendance timeIn(Long employeeId, String attendanceStatus) {
+    public Attendance timeIn(Long employeeId, String attendanceStatus , String location) {
         // Fetch the employee by ID
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
@@ -129,5 +129,9 @@ public class AttendanceServiceImpl implements AttendanceService {
      return false;
  }
 
+ public boolean isDayStatusCompleted(Long employeeId, Long attendanceId) {
+    String dayStatus = attendanceRepository.findDayStatusByEmployeeIdAndAttendanceId(employeeId, attendanceId);
+    return "Completed".equalsIgnoreCase(dayStatus);  // case-insensitive check
+}
 
 }

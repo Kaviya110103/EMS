@@ -4,7 +4,7 @@ import { useLoadScript } from "@react-google-maps/api";
 const libraries = ["places"];
 const apiKey = "AIzaSyCOWhjk4Qxz3spiNz2BKgmQqdrO2vE6YL0"; // Replace with your API Key
 
-const LocationSelector = () => {
+const LocationSelector = ({ onLocationStatusChange }) => {
   const { isLoaded } = useLoadScript({ googleMapsApiKey: apiKey, libraries });
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
@@ -84,7 +84,13 @@ const LocationSelector = () => {
   const checkInsideBoundary = (lat, lng) => {
     if (!selectedBranch) return;
     const distance = haversineDistance(lat, lng, selectedBranch.lat, selectedBranch.lng);
-    setStatusMessage(distance <= 50 ? "✅ You are inside the selected location." : "❌ You are outside the selected location.");
+    const isInside = distance <= 50;
+    setStatusMessage(isInside ? "✅ You are inside the selected location." : "❌ You are outside the selected location.");
+    
+    // Pass the status to the parent component
+    if (onLocationStatusChange) {
+      onLocationStatusChange(isInside);
+    }
   };
 
   const haversineDistance = (lat1, lon1, lat2, lon2) => {
@@ -99,44 +105,53 @@ const LocationSelector = () => {
   };
 
   return (
-    <div className="container-fluid d-flex flex-column align-items-center justify-content-center vh-100 bg-white p-4">
-      <div className="card shadow-sm p-4" style={{ maxWidth: "800px", width: "100%" }}>
-        <h2 className="text-center mb-4">Your Current Location</h2>
-        <p className="text-center">{latitude && longitude ? `Latitude: ${latitude}, Longitude: ${longitude}` : "Fetching location..."}</p>
-        <h3 className="text-center mb-3">Current Address</h3>
-        <p className="text-center mb-4">{address}</p>
+    <div
+      className="container d-flex flex-column align-items-center justify-content-start bg-white p-3 mb-4"
+      style={{
+        borderRadius: "10px",
+        marginTop: "10px",
+        backgroundColor: "white",
+        boxShadow: "0 4px 8px rgba(8, 0, 0, 0.1)",
+        maxWidth: "600px",
+        width: "100%",
+      }}
+    >
+      <div className="card shadow-sm p-3" style={{ width: "100%" }}>
+        <p className="text-center mb-2" style={{ fontSize: "14px" }}>Your Current Location</p>
+        <p className="text-center mb-2" style={{ fontSize: "12px" }}>{address}</p>
 
-        <h3 className="text-center mb-3">Which is your designated branch?</h3>
-        <fieldset className="bg-light p-3 rounded mb-4">
+        <p className="text-center mb-2" style={{ fontSize: "14px" }}>Which is your designated branch?</p>
+        <fieldset className="bg-light p-2 rounded mb-3">
           <div className="d-flex justify-content-around">
             <div className="form-check">
               <input className="form-check-input" type="radio" name="branch" value="hopes" onChange={handleBranchSelection} id="hopes" />
-              <label className="form-check-label" htmlFor="hopes">Hopes</label>
+              <label className="form-check-label" htmlFor="hopes" style={{ fontSize: "12px" }}>Hopes</label>
             </div>
             <div className="form-check">
               <input className="form-check-input" type="radio" name="branch" value="hundredFt" onChange={handleBranchSelection} id="hundredFt" />
-              <label className="form-check-label" htmlFor="hundredFt">100ft</label>
+              <label className="form-check-label" htmlFor="hundredFt" style={{ fontSize: "12px" }}>100ft</label>
             </div>
             <div className="form-check">
               <input className="form-check-input" type="radio" name="branch" value="kuniyamuthur" onChange={handleBranchSelection} id="kuniyamuthur" />
-              <label className="form-check-label" htmlFor="kuniyamuthur">Kuniyamuthur</label>
+              <label className="form-check-label" htmlFor="kuniyamuthur" style={{ fontSize: "12px" }}>Kuniyamuthur</label>
             </div>
           </div>
         </fieldset>
 
-        <h4 className="text-center mb-3">{statusMessage}</h4>
+        <h4 className="text-center mb-2" style={{ fontSize: "14px" }}>{statusMessage}</h4>
         {selectedBranch && (
           <div className="d-flex justify-content-center">
             <button
-              className="btn btn-primary"
+              className="btn btn-primary btn-sm"
               onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${selectedBranch.lat},${selectedBranch.lng}&travelmode=walking`, "_blank")}
+              style={{ fontSize: "12px" }}
             >
-              🚀 Get Directions
+              � Get Directions
             </button>
           </div>
         )}
 
-        <div ref={mapRef} className="mt-4" style={{ width: "100%", height: "400px", borderRadius: "8px" }}></div>
+        <div ref={mapRef} className="mt-3" style={{ width: "100%", height: "300px", borderRadius: "8px" }}></div>
       </div>
     </div>
   );

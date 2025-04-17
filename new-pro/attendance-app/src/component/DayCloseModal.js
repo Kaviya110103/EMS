@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { FaClock } from "react-icons/fa";
 
+
 const customStyles = {
   content: {
     top: "50%",
@@ -23,6 +24,7 @@ const customStyles = {
   },
 };
 
+
 const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDayClosed, setIsDayClosed] = useState(false); // Hide button after closing day
@@ -34,7 +36,10 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
     statusMessage: "Checking...",
   });
 
+
  
+
+
 
 
   useEffect(() => {
@@ -44,16 +49,16 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
           `http://localhost:8080/api/attendance/employee/${employeeId}`
         );
         const data = await response.json();
-  
+ 
         console.log("Fetched attendance data:", data);
-  
+ 
         if (data && data.length > 0) {
           const lastAttendance = data[data.length - 1]; // Get last record
           console.log("Extracted last attendance:", lastAttendance);
           const todayDate = new Date().toISOString().split("T")[0];
-  
+ 
           let statusMessage = "Attendance is recorded";
-  
+ 
           if (
             lastAttendance.dateIn === todayDate &&
             lastAttendance.dayStatus === "Completed"
@@ -61,7 +66,7 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
             statusMessage = "Attendance was recorded";
             setIsDayClosed(true); // Hide button if attendance is completed
           }
-  
+ 
           setAttendanceData({
             id: lastAttendance.id,
             dateIn: lastAttendance.dateIn,
@@ -86,17 +91,20 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
         });
       }
     }
-  
+ 
     fetchAttendance();
   }, [employeeId]);
-  
+ 
+
 
   const handleDayCloseClick = () => {
     setIsModalOpen(true);
   };
 
 
-  
+
+
+ 
   const updateDayStatus = async (attendanceId) => {
     setIsUpdating(true);
     try {
@@ -112,7 +120,7 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
           }),
         }
       );
-  
+ 
       if (response.ok) {
         console.log("Day status updated successfully");
         setTimeout(() => {
@@ -127,11 +135,12 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
       setIsUpdating(false);
     }
   };
-  
+ 
   const closeModal = () => {
     setIsModalOpen(false);
   };
-  
+ 
+
 
   // const updateDayStatus = async (attendanceId) => {
   //   setIsUpdating(true);
@@ -148,11 +157,11 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
   //         }),
   //       }
   //     );
-  
+ 
   //     if (response.ok) {
   //       console.log("Day status updated successfully");
   //       setIsDayClosed(true);
-  
+ 
   //       // Show loading for 1 second before reloading
   //       setTimeout(() => {
   //         setIsModalOpen(false);
@@ -167,11 +176,13 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
   //     setIsUpdating(false);
   //   }
   // };
-  
+ 
+
 
   function formatTime(timeString) {
     const [hours, minutes, seconds] = timeString.split(":");
     const date = new Date(`1970-01-01T${timeString}Z`);
+
 
     let hour = date.getUTCHours();
     const ampm = hour >= 12 ? "PM" : "AM";
@@ -186,8 +197,10 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
       .toString()
       .padStart(2, "0");
 
+
     return `${hour}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
   }
+
 
   const calculateTotalHours = () => {
     if (!timeIn || !timeOut) return "Not available";
@@ -199,18 +212,20 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
     return `${hours} hours, ${minutes} minutes`;
   };
 
+
   return (
     <>
       <div style={{ textAlign: "center" }}>
         {/* Show button only if day is not closed */}
         {!isDayClosed && (
   <button className="col-7 text-center button-81"   onClick={() => {
-    handleDayCloseClick(); 
+    handleDayCloseClick();
     updateDayStatus(attendanceId);
   }}>
     Day Close
   </button>
 )}
+
 
         {/* Show attendance details when the button is hidden */}
         {!isModalOpen && isDayClosed && (
@@ -219,7 +234,9 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
   </div>
 )}
 
+
       </div>
+
 
       {/* Modal for Day Close */}
       <Modal
@@ -262,8 +279,13 @@ const DayCloseModal = ({ employeeId, timeIn, timeOut, attendanceId }) => {
   </div>
 </Modal>
 
+
     </>
   );
 };
 
+
 export default DayCloseModal;
+
+
+

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FaSearch, FaPrint, FaCalendarAlt, FaUser, FaBuilding } from "react-icons/fa";
 
 const EmployeeRecords = () => {
   const [employeeId, setEmployeeId] = useState("");
@@ -14,6 +15,7 @@ const EmployeeRecords = () => {
   const [presentDaysCount, setPresentDaysCount] = useState(0);
   const [presentCount, setPresentCount] = useState(0);
   const [absentCount, setAbsentCount] = useState(0);
+  const [isEmployeeIdEnabled, setIsEmployeeIdEnabled] = useState(false);
 
   useEffect(() => {
     const fetchAttendanceData = async () => {
@@ -37,22 +39,29 @@ const EmployeeRecords = () => {
     e.preventDefault();
     let filtered = attendanceData;
 
+    // Apply branch filter if selected
     if (selectedBranch) {
       filtered = filtered.filter(
         (attendance) => attendance.employee.branch === selectedBranch
       );
-    } else if (employeeId) {
+      setIsEmployeeIdEnabled(true); // Enable Employee ID field after selecting a branch
+    }
+
+    // Apply employee ID filter if selected
+    if (employeeId) {
       filtered = filtered.filter(
         (attendance) => attendance.employee.id === parseInt(employeeId)
       );
     }
 
+    // Apply month filter if selected
     if (selectedMonth) {
       filtered = filtered.filter(
         (attendance) => new Date(attendance.dateIn).getMonth() + 1 === parseInt(selectedMonth)
       );
     }
 
+    // Apply date range filter if selected
     if (startDate && endDate) {
       filtered = filtered.filter(
         (attendance) =>
@@ -96,210 +105,206 @@ const EmployeeRecords = () => {
   };
 
   return (
-    <div className="container mt-4 bg-light p-4 shadow rounded">
+    <div className="container mx-auto px-4 py-8">
       <style>
         {`
           .page-title {
-            color: #0056b3;
+            color: #2c3e50;
             font-weight: bold;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             text-align: center;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
           }
-          .form-container {
-            background: #f8f9fa;
-            padding: 20px;
+          .filter-card {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            padding: 1rem;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            color: #2c3e50;
+            width: 100%;
+            max-width: 300px;
           }
-          .form-group label {
+          .filter-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+          }
+          .filter-card label {
             font-weight: bold;
-            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2c3e50;
+            font-size: 0.9rem;
           }
-          .attendance-table-container {
-            margin-top: 20px;
+          .filter-card input,
+          .filter-card select {
+            background: rgba(255, 255, 255, 0.8);
+            color: #2c3e50;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            padding: 0.5rem;
+            width: 100%;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-size: 0.9rem;
           }
-          .table-header {
-            background: #007bff;
+          .filter-card input:focus,
+          .filter-card select:focus {
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+            outline: none;
+          }
+          .filter-card input::placeholder {
+            color: rgba(44, 62, 80, 0.7);
+          }
+          .search-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-          }
-          .error-message {
-            color: red;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            text-align: center;
+            transition: background-color 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
           }
-          .btn-primary, .btn-info {
-            font-size: 1rem;
-            font-weight: bold;
+          .search-button:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+          }
+          .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
           }
         `}
       </style>
 
-      <h3 className="page-title">Employee Attendance Records</h3>
-      <form onSubmit={handleSearch} className="form-container">
-        <style>
-          {`
-            .form-container {
-              background: linear-gradient(135deg, #007bff, #00d4ff);
-              color: #fff;
-              padding: 30px;
-              border-radius: 12px;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-              margin-top: 20px;
-              width: 100%;
-              max-width: 100%;
-            }
-            .form-container label {
-              font-weight: bold;
-              color: #f8f9fa;
-            }
-            .form-container input, 
-            .form-container select {
-              background: #f8f9fa;
-              color: #333;
-              border: 2px solid #007bff;
-              border-radius: 8px;
-              padding: 10px;
-              width: 100%;
-            }
-            .form-container input:focus, 
-            .form-container select:focus {
-              border-color: #00d4ff;
-              box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
-              outline: none;
-            }
-            .form-container button {
-              background: #0056b3;
-              color: #fff;
-              border: none;
-              border-radius: 8px;
-              padding: 12px;
-              font-size: 1rem;
-              font-weight: bold;
-              transition: background-color 0.3s;
-              width: 100%;
-            }
-            .form-container button:hover {
-              background: #003f7f;
-            }
-            .form-container .row {
-              margin-bottom: 15px;
-            }
-          `}
-        </style>
+      <h1 className="page-title">Employee Attendance Records</h1>
 
-        <div className="row gy-3">
-          <div className="col-md-3 col-sm-12">
-            <div className="form-group">
-              <label htmlFor="employeeId">EmployeeID</label>
-              <input
-                type="text"
-                id="employeeId"
-                className="form-control"
-                value={employeeId}
-                onChange={(e) => setEmployeeId(e.target.value)}
-                placeholder="Enter Employee ID"
-                disabled={selectedBranch !== ""}
-              />
-            </div>
-          </div>
+      {/* Filter Section */}
+      <form onSubmit={handleSearch} className="filter-container">
+        {/* Employee ID Filter */}
+        <div className="filter-card">
+          <label htmlFor="employeeId">
+            <FaUser className="text-blue-500" />
+            Employee ID
+          </label>
+          <input
+            type="text"
+            id="employeeId"
+            value={employeeId}
+            onChange={(e) => setEmployeeId(e.target.value)}
+            placeholder="Enter Employee ID"
+            disabled={!isEmployeeIdEnabled && selectedBranch !== ""}
+          />
+        </div>
 
-          <div className="col-md-3 col-sm-12">
-            <div className="form-group">
-              <label htmlFor="startDate">StartDate</label>
-              <input
-                type="date"
-                id="startDate"
-                className="form-control"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="col-md-3 col-sm-12">
-            <div className="form-group">
-              <label htmlFor="endDate">EndDate</label>
-              <input
-                type="date"
-                id="endDate"
-                className="form-control"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="col-md-3 col-sm-12">
-            <div className="form-group">
-              <label htmlFor="month">Month</label>
-              <select
-                id="month"
-                className="form-control"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-              >
-                <option value="">All Months</option>
-                <option value="01">January</option>
-                <option value="02">February</option>
-                <option value="03">March</option>
-                <option value="04">April</option>
-                <option value="05">May</option>
-                <option value="06">June</option>
-                <option value="07">July</option>
-                <option value="08">August</option>
-                <option value="09">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="col-md-3 col-sm-12">
-            <div className="form-group">
-              <label htmlFor="branch">Branch</label>
-              <select
-                id="branch"
-                className="form-control"
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value)}
-              >
-                <option value="">All Branches</option>
-                <option value="IIE 100FT Gandhipuram">IIE 100FT Gandhipuram</option>
-                <option value="IIE Kuniyamuthur">IIE Kuniyamuthur</option>
-                <option value="IIE Hopes">IIE Hopes</option>
-              </select>
-            </div>
+        {/* Date Range Filter */}
+        <div className="filter-card">
+          <label htmlFor="startDate">
+            <FaCalendarAlt className="text-blue-500" />
+            Date Range
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="date"
+              id="startDate"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+            <input
+              type="date"
+              id="endDate"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
           </div>
         </div>
 
-        <div className="row mt-3">
-          <div className="col-12">
-            <button type="submit" className="btn btn-primary w-100">
-              Search
-            </button>
-          </div>
+        {/* Month Filter */}
+        <div className="filter-card">
+          <label htmlFor="month">
+            <FaCalendarAlt className="text-blue-500" />
+            Month
+          </label>
+          <select
+            id="month"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+          >
+            <option value="">All Months</option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+
+        {/* Branch Filter */}
+        <div className="filter-card">
+          <label htmlFor="branch">
+            <FaBuilding className="text-blue-500" />
+            Branch
+          </label>
+          <select
+            id="branch"
+            value={selectedBranch}
+            onChange={(e) => {
+              setSelectedBranch(e.target.value);
+              if (!e.target.value) {
+                setIsEmployeeIdEnabled(false); // Disable Employee ID field if branch is cleared
+              }
+            }}
+          >
+            <option value="">All Branches</option>
+            <option value="IIE 100FT Gandhipuram">IIE 100FT Gandhipuram</option>
+            <option value="IIE Kuniyamuthur">IIE Kuniyamuthur</option>
+            <option value="IIE Hopes">IIE Hopes</option>
+          </select>
+        </div>
+
+        {/* Search Button */}
+        <div className="filter-card">
+          <button type="submit" className="search-button">
+            <FaSearch />
+            Search
+          </button>
         </div>
       </form>
 
-      {isLoading && <p>Loading...</p>}
+      {/* Rest of the code remains the same */}
+      {isLoading && <div className="loading-spinner"></div>}
       {error && <p className="error-message">{error}</p>}
 
       {filteredAttendance.length > 0 && (
         <div className="attendance-table-container" id="attendance-table">
-          <h4>Attendance Records</h4>
+          <h2 className="text-xl font-bold mb-4">Attendance Records</h2>
           {selectedMonth && presentDaysCount > 0 && (
-            <p>
-              Employee was present for {presentDaysCount} day{presentDaysCount > 1 ? "s" : ""} in Above Month.
+            <p className="mb-4">
+              Employee was present for {presentDaysCount} day{presentDaysCount > 1 ? "s" : ""} in the selected month.
             </p>
           )}
-          <p>
+          <p className="mb-4">
             Total Present: {presentCount} | Total Absent: {absentCount}
           </p>
-          <table className="table table-striped table-bordered">
+          <table className="table">
             <thead>
-              <tr className="text-center table-header">
-                <th>Attendance ID</th>
+              <tr>
                 <th>Employee ID</th>
                 <th>Name</th>
                 <th>Branch</th>
@@ -308,13 +313,11 @@ const EmployeeRecords = () => {
                 <th>Time Out</th>
                 <th>Total Working Hours</th>
                 <th>Attendance Status</th>
-
               </tr>
             </thead>
             <tbody>
               {filteredAttendance.map((attendance) => (
-                <tr key={attendance.id} className="text-center">
-                  <td>{attendance.id}</td>
+                <tr key={attendance.id}>
                   <td>{attendance.employee.id}</td>
                   <td>{attendance.employee.firstName}</td>
                   <td>{attendance.employee.branch}</td>
@@ -328,14 +331,15 @@ const EmployeeRecords = () => {
             </tbody>
           </table>
 
-          <button onClick={handlePrint} className="btn btn-info mt-3">
+          <button onClick={handlePrint} className="btn btn-info mt-4">
+            <FaPrint />
             Print Attendance Records
           </button>
         </div>
       )}
 
       {!isLoading && !error && filteredAttendance.length === 0 && (
-        <p>No records found for this employee.</p>
+        <p className="text-center text-gray-600">No records found for this employee.</p>
       )}
     </div>
   );

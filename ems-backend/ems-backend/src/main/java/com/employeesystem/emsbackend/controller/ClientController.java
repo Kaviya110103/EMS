@@ -22,13 +22,19 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:19000", "http://localhost:8081",    "exp://192.168.1.14:8081", "http://192.168.1.14:8081"})
+// @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:19000", "http://localhost:8081",    "exp://192.168.1.14:8081", "http://192.168.1.14:8081"})
+
+
 @RestController
 @RequestMapping("/api/images")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ClientController {
     @Autowired
     private ImageService imageService;
@@ -60,7 +66,7 @@ public class ClientController {
 
    
     @PostMapping("/uploadImage1")
-    @CrossOrigin(origins = "http://localhost:3000")
+    // @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<String> uploadImage1(
             @RequestParam("image1") MultipartFile file1,
             @RequestParam("employeeId") Long employeeId,
@@ -158,38 +164,42 @@ public class ClientController {
     // Endpoint to get images by employeeId
     
     // Display the first image by ID
-   
     @PostMapping("/uploadImage2/{id}")
-    @CrossOrigin(origins = "http://localhost:3000") // Allow React app to access this API
     public ResponseEntity<String> uploadImage2(
             @PathVariable("id") Long id,
             @RequestParam("image2") MultipartFile file2) throws IOException, SQLException {
     
+        // Check if the uploaded file is null or empty
+        if (file2 == null || file2.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("{\"message\":\"No file uploaded or file is empty.\"}");
+        }
+    
         try {
-            // Fetch Image record by ID
+            // Fetch the Image record by ID from the database
             Image image = imageService.findImageById(id);
             if (image == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("{\"message\":\"Image not found for the provided ID\"}");
             }
     
-            // Update the Image record with the uploaded file
-            if (file2 != null && !file2.isEmpty()) {
-                image.setImage2(new javax.sql.rowset.serial.SerialBlob(file2.getBytes()));
-            }
-            image.setUploadDate(LocalDate.now());
+            // Handle the file upload by converting it to a Blob and setting it
+            image.setImage2(new javax.sql.rowset.serial.SerialBlob(file2.getBytes()));
+            image.setUploadDate(LocalDate.now());  // Set the upload date
     
-            // Save the updated Image record
+            // Save the updated Image record in the database
             imageService.update(image);
     
             // Return success response
             return ResponseEntity.ok("{\"id\":" + image.getId() + ", \"message\":\"Image 2 uploaded successfully\"}");
+    
         } catch (Exception e) {
             e.printStackTrace();  // Log the error for debugging
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("{\"message\":\"Internal server error: " + e.getMessage() + "\"}");
         }
     }
+    
     
 //     @PostMapping("/uploadImage2/{id}")
 // @CrossOrigin(origins = "http://localhost:3000")
@@ -321,4 +331,36 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping(value = "/displayImagesByAttendanceId/{attendanceId}")
+public ResponseEntity<Map<String, Object>> displayImagesByAttendanceId(@PathVariable("attendanceId") Long attendanceId) {
+    try {
+        Optional<Image> imageOptional = imageRepository.findByAttendanceId(attendanceId);
+        
+        if (imageOptional.isPresent()) {
+            Image image = imageOptional.get();
+            Map<String, Object> response = new HashMap<>();
+            
+            response.put("attendanceId", attendanceId);
+            response.put("imageId", image.getId()); // Include Image ID
+            
+            if (image.getImage() != null) {
+                response.put("imageUrl1", "http://localhost:8080/api/images/displayImage1ByAttendanceId/" + attendanceId);
+            }
+            if (image.getImage2() != null) {
+                response.put("imageUrl2", "http://localhost:8080/api/images/displayImage2ByAttendanceId/" + attendanceId);
+            }
+
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "No images found for this attendance ID"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Collections.singletonMap("error", "Internal server error"));
+    }
+}
+
 }
