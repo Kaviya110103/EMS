@@ -129,5 +129,9 @@ public class AttendanceServiceImpl implements AttendanceService {
      return false;
  }
 
+ public boolean isDayStatusCompleted(Long employeeId, Long attendanceId) {
+    String dayStatus = attendanceRepository.findDayStatusByEmployeeIdAndAttendanceId(employeeId, attendanceId);
+    return "Completed".equalsIgnoreCase(dayStatus);  // case-insensitive check
+}
 
 }

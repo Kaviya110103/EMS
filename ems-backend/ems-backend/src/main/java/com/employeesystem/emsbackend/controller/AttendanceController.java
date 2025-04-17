@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:19000", "http://localhost:8081",    "exp://192.168.1.24:8081", "http://192.168.1.24:8081"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:19000", "http://localhost:8081",    "exp://192.168.1.14:8081", "http://192.168.1.14:8081"})
 
 @RestController
 @RequestMapping("/api/attendance")
@@ -151,5 +151,19 @@ public class AttendanceController {
      }
  }
  
+
+ @PostMapping("/check-day-status")
+ public ResponseEntity<String> checkDayStatus(
+         @RequestParam Long employeeId,
+         @RequestParam Long attendanceId) {
+
+     boolean isCompleted = attendanceService.isDayStatusCompleted(employeeId, attendanceId);
+
+     if (isCompleted) {
+         return ResponseEntity.ok("Day status is Completed");
+     } else {
+         return ResponseEntity.ok("Day status is NOT Completed");
+     }
+ }
  
 }

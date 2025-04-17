@@ -18,5 +18,3 @@ public class EmsBackendApplication {
 ///2. URL: http://localhost:8080/api/images/uploadImage2/{id}/{attendanceId}    image2 , attendanceId 
 /// 
 /// 
-
-

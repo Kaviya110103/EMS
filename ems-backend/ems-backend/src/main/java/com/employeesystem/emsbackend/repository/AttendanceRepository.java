@@ -18,6 +18,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     Optional<Attendance> findLatestAttendanceByEmployeeId(Long employeeId);
 
     Attendance findTopByEmployeeIdOrderByDateInDesc(Long employeeId);
+
+    @Query("SELECT a.dayStatus FROM Attendance a WHERE a.id = :attendanceId AND a.employee.id = :employeeId")
+    String findDayStatusByEmployeeIdAndAttendanceId(@Param("employeeId") Long employeeId,
+                                                    @Param("attendanceId") Long attendanceId);
     
 
     @Query("SELECT a FROM Attendance a WHERE a.employee.id = :employeeId AND a.dateIn = :dateIn")

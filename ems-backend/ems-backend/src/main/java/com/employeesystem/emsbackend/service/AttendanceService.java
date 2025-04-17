@@ -35,4 +35,6 @@ public interface AttendanceService {
 
     boolean updateDayStatus(Long attendanceId, String dayStatus);
 
+    boolean isDayStatusCompleted(Long employeeId, Long attendanceId);
+
 }
